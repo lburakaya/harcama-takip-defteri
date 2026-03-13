@@ -1,0 +1,238 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ─── KULLANICI ────────────────────────────────────────────
+
+model User {
+  id               String    @id @default(cuid())
+  email            String    @unique
+  passwordHash     String
+  firstName        String
+  lastName         String
+  currency         String    @default("TRY")
+  reportEmail      String?
+  emailVerified    Boolean   @default(false)
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  expenses         Expense[]
+  documents        Document[]
+  analyses         Analysis[]
+  reports          Report[]
+  refreshTokens    RefreshToken[]
+  monthlyBudgets   MonthlyBudget[]
+
+  @@map("users")
+}
+
+model RefreshToken {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@map("refresh_tokens")
+}
+
+// ─── AYLIK BÜTÇE HEDEFİ ──────────────────────────────
+
+model MonthlyBudget {
+  id                String   @id @default(cuid())
+  userId            String
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  year              Int
+  month             Int
+
+  monthlyIncome     Decimal  @db.Decimal(12, 2)
+  savingsGoal       Decimal  @db.Decimal(12, 2)
+
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@unique([userId, year, month])
+  @@index([userId])
+  @@map("monthly_budgets")
+}
+
+// ─── HARCAMALAR ──────────────────────────────────────────
+
+model Expense {
+  id          String          @id @default(cuid())
+  userId      String
+  user        User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  name        String
+  amount      Decimal         @db.Decimal(12, 2)
+  currency    String          @default("TRY")
+  category    ExpenseCategory @default(OTHER)
+  note        String?
+
+  expenseDate DateTime        @db.Date
+  year        Int
+  month       Int
+  day         Int
+
+  source      ExpenseSource   @default(MANUAL)
+  documentId  String?
+  document    Document?       @relation(fields: [documentId], references: [id])
+
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  @@index([userId, year, month])
+  @@index([userId, expenseDate])
+  @@map("expenses")
+}
+
+enum ExpenseCategory {
+  MARKET
+  BILLS
+  TRANSPORT
+  FOOD
+  ENTERTAINMENT
+  HEALTH
+  CLOTHING
+  EDUCATION
+  SUBSCRIPTION
+  OTHER
+}
+
+enum ExpenseSource {
+  MANUAL
+  DOCUMENT_PARSE
+}
+
+// ─── DÖKÜMANLAR ──────────────────────────────────────────
+
+model Document {
+  id           String         @id @default(cuid())
+  userId       String
+  user         User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  fileName     String
+  fileKey      String
+  fileSize     Int
+  mimeType     String
+  bankName     String?
+  periodType   PeriodType
+  periodStart  DateTime       @db.Date
+  periodEnd    DateTime       @db.Date
+
+  parseStatus  ParseStatus    @default(PENDING)
+  parseError   String?
+  parsedAt     DateTime?
+
+  expenses     Expense[]
+  analyses     Analysis[]
+
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+
+  @@index([userId])
+  @@map("documents")
+}
+
+enum PeriodType {
+  MONTHLY
+  TWO_MONTHS
+  YEARLY
+}
+
+enum ParseStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+}
+
+// ─── AI ANALİZLER ────────────────────────────────────────
+
+model Analysis {
+  id           String       @id @default(cuid())
+  userId       String
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  type         AnalysisType
+  status       AnalysisStatus @default(PENDING)
+
+  analysisDate DateTime?    @db.Date
+  year         Int?
+  month        Int?
+  documentId   String?
+  document     Document?    @relation(fields: [documentId], references: [id])
+
+  rawPrompt    String?      @db.Text
+  rawResponse  String?      @db.Text
+
+  unnecessaryExpenses Json?
+  savingsSuggestions  Json?
+  totalSpent         Decimal?          @db.Decimal(12, 2)
+  potentialSavings   Decimal?          @db.Decimal(12, 2)
+  summary            String?           @db.Text
+
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+
+  reports      Report[]
+
+  @@index([userId, type])
+  @@index([userId, year, month])
+  @@map("analyses")
+}
+
+enum AnalysisType {
+  DAILY
+  MONTHLY
+  DOCUMENT
+}
+
+enum AnalysisStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+}
+
+// ─── RAPORLAR (PDF) ───────────────────────────────────────
+
+model Report {
+  id          String       @id @default(cuid())
+  userId      String
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  analysisId  String
+  analysis    Analysis     @relation(fields: [analysisId], references: [id])
+
+  type        ReportType
+  fileKey     String
+  fileName    String
+
+  emailSentTo String?
+  emailSentAt DateTime?
+  emailStatus EmailStatus  @default(PENDING)
+
+  createdAt   DateTime     @default(now())
+
+  @@index([userId])
+  @@map("reports")
+}
+
+enum ReportType {
+  DAILY
+  MONTHLY
+  DOCUMENT
+}
+
+enum EmailStatus {
+  PENDING
+  SENT
+  FAILED
+}
