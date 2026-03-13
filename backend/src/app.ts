@@ -18,6 +18,7 @@ import budgetRoutes from './modules/budgets/budgets.routes';
 import documentRoutes from './modules/documents/documents.routes';
 import analysisRoutes from './modules/analysis/analysis.routes';
 import reportRoutes from './modules/reports/reports.routes';
+import userRoutes from './modules/users/users.routes';
 
 const app = express();
 
@@ -54,6 +55,7 @@ app.use('/api/v1/budgets', apiRateLimit, budgetRoutes);
 app.use('/api/v1/documents', apiRateLimit, documentRoutes);
 app.use('/api/v1/analysis', apiRateLimit, analysisRoutes);
 app.use('/api/v1/reports', apiRateLimit, reportRoutes);
+app.use('/api/v1/users', apiRateLimit, userRoutes);
 
 // ─── ERROR HANDLER ──────────────────────────────────────
 app.use(errorMiddleware);

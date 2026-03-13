@@ -19,11 +19,10 @@ router.get('/', async (req: AuthRequest, res, next) => {
 });
 
 // ─── GET BUDGET DETAIL ──────────────────────────────────
-router.get('/detail', async (req: AuthRequest, res, next) => {
+router.get('/:year/:month', async (req: AuthRequest, res, next) => {
   try {
-    const { year, month } = req.query;
-    const y = parseInt(year as string);
-    const m = parseInt(month as string);
+    const y = parseInt(req.params.year as string);
+    const m = parseInt(req.params.month as string);
 
     const budget = await prisma.monthlyBudget.findUnique({
       where: { userId_year_month: { userId: req.user!.id, year: y, month: m } },
@@ -105,4 +104,21 @@ router.post('/', async (req: AuthRequest, res, next) => {
   }
 });
 
+// ─── DELETE BUDGET ───────────────────────────────────────
+router.delete('/:year/:month', async (req: AuthRequest, res, next) => {
+  try {
+    const y = parseInt(req.params.year as string);
+    const m = parseInt(req.params.month as string);
+
+    await prisma.monthlyBudget.delete({
+      where: { userId_year_month: { userId: req.user!.id, year: y, month: m } },
+    });
+
+    res.json({ message: 'Bütçe hedefi silindi' });
+  } catch (err) {
+    next(err);
+  }
+});
+
 export default router;
+

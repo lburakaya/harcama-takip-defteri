@@ -86,7 +86,7 @@ router.post('/document', async (req: AuthRequest, res, next) => {
 });
 
 // ─── SSE STREAM ─────────────────────────────────────────
-router.get('/stream/:id', async (req: AuthRequest, res, next) => {
+router.get('/:id/stream', async (req: AuthRequest, res, next) => {
   try {
     const analysis = await prisma.analysis.findFirst({
       where: { id: req.params.id, userId: req.user!.id },

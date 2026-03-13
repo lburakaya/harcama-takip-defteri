@@ -1,0 +1,54 @@
+﻿
+> frontend@0.0.0 build
+> tsc -b && vite build
+
+[36mvite v8.0.0 [32mbuilding client environment for production...[36m[39m
+[2K
+transforming...Ô£ô 5766 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                     0.45 kB Ôöé gzip:   0.29 kB
+dist/assets/index-AQ5bxx-c.css     22.33 kB Ôöé gzip:   5.44 kB
+dist/assets/index-CeAmWpOc.js   1,196.53 kB Ôöé gzip: 357.91 kB
+
+[32mÔ£ô built in 1.05s[39m
+node.exe : [33m[plugi
+n builtin:vite-reporte
+r] 
+At line:1 char:1
++ & "C:\Program Files\
+nodejs/node.exe" "C:\P
+rogram Files\nodejs/no
+de_mo ...
++ ~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~
+~~~~~
+    + CategoryInfo    
+          : NotSpeci  
+  fied: ([33m[plug   
+ in builtin:vite-r    
+eporter] :String)     
+[], RemoteExcept    io
+n
+    + FullyQualifiedE 
+   rrorId : NativeCo  
+  mmandError
+ 
+(!) Some chunks are la
+rger than 500 kB after
+ minification. Conside
+r:
+- Using dynamic import
+() to code-split the a
+pplication
+- Use build.rolldownOp
+tions.output.codeSplit
+ting to improve chunki
+ng: https://rolldown.r
+s/reference/OutputOpti
+ons.codeSplitting
+- Adjust chunk size li
+mit for this warning v
+ia build.chunkSizeWarn
+ingLimit.[39m

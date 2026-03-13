@@ -67,7 +67,7 @@ router.post('/generate', async (req: AuthRequest, res, next) => {
 });
 
 // ─── DOWNLOAD REPORT ────────────────────────────────────
-router.get('/download/:id', async (req: AuthRequest, res, next) => {
+router.get('/:id/download', async (req: AuthRequest, res, next) => {
   try {
     const report = await prisma.report.findFirst({
       where: { id: req.params.id, userId: req.user!.id },
@@ -89,7 +89,7 @@ router.get('/download/:id', async (req: AuthRequest, res, next) => {
 });
 
 // ─── EMAIL REPORT ───────────────────────────────────────
-router.post('/email/:id', async (req: AuthRequest, res, next) => {
+router.post('/:id/email', async (req: AuthRequest, res, next) => {
   try {
     const { email } = req.body;
 

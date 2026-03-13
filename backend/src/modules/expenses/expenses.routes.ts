@@ -86,7 +86,7 @@ router.post('/', async (req: AuthRequest, res, next) => {
 });
 
 // ─── UPDATE EXPENSE ─────────────────────────────────────
-router.put('/:id', async (req: AuthRequest, res, next) => {
+router.patch('/:id', async (req: AuthRequest, res, next) => {
   try {
     const { name, amount, category, expenseDate, note } = req.body;
     const data: any = {};
